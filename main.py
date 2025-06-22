@@ -48,5 +48,3 @@ while True:
     if opcao == 's':
         print("Saindo do jogo.")
         break
-
-    #bom dia
