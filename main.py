@@ -1,6 +1,7 @@
 # Jogo de bingo
 
 import random
+import time
 
 
 def gerar_cartela():
