@@ -3,24 +3,30 @@
 import random
 import time
 
+N_JOGADORES = 1
 
-def gerar_cartela():
+def gerar_cartela(n_cartelas):
+    cartelas = []
     cartela = []
-    numeros = list(range(1, 76))
-    random.shuffle(numeros)
-    print("Números embaralhados:", numeros)
+    for j in range(n_cartelas):
+        globals()[f'cartela_{j}'] = []
+        numeros = list(range(1, 76))
+        random.shuffle(numeros)
 
-    for i in range(5):
-        coluna = []
-        for n in numeros:
-            if len(coluna) == 5:
-                break
-            if n // 15 == i:
-                coluna.append(n)
+        for i in range(5):
+            coluna = []
+            for n in numeros:
+                if len(coluna) == 5:
+                    break
+                if n // 15 == i:
+                    coluna.append(n)
+            if i == 2:
+                coluna[2] = "espaço livre"
 
-        cartela.append(coluna)
+            cartela.append(coluna)
+        cartelas.append(cartela)
 
-    return cartela
+    return cartelas
 
 
 def pega_numero(sorteio):
@@ -29,8 +35,8 @@ def pega_numero(sorteio):
     else:
         return None
 
-
-cartela = gerar_cartela()
+cartelas = gerar_cartela(N_JOGADORES)
+print (cartelas)
 
 sorteio = list(range(1, 76))
 random.shuffle(sorteio)
