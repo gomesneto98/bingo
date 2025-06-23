@@ -8,7 +8,10 @@ c = canvas.Canvas("cartelas.pdf")
 c.save()
 
 N_JOGADORES = 1
+N_JOGADORES = 1
 
+def gerar_cartela(n_cartelas):
+    cartelas = []
 def gerar_cartela(n_cartelas):
     cartelas = []
     cartela = []
@@ -25,10 +28,22 @@ def gerar_cartela(n_cartelas):
                     coluna.append(n)
             if i == 2:
                 coluna[2] = "espaço livre"
+        for i in range(5):
+            coluna = []
+            for n in numeros:
+                if len(coluna) == 5:
+                    break
+                if n // 15 == i:
+                    coluna.append(n)
+            if i == 2:
+                coluna[2] = "espaço livre"
 
             cartela.append(coluna)
         cartelas.append(cartela)
+            cartela.append(coluna)
+        cartelas.append(cartela)
 
+    return cartelas
     return cartelas
 
 
@@ -38,6 +53,8 @@ def pega_numero(sorteio):
     else:
         return None
 
+cartelas = gerar_cartela(N_JOGADORES)
+print (cartelas)
 cartelas = gerar_cartela(N_JOGADORES)
 print (cartelas)
 
