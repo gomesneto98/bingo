@@ -2,6 +2,10 @@
 
 import random
 import time
+from reportlab.pdfgen import canvas
+
+c = canvas.Canvas("cartelas.pdf")
+c.save()
 
 N_JOGADORES = 1
 
@@ -9,7 +13,6 @@ def gerar_cartela(n_cartelas):
     cartelas = []
     cartela = []
     for j in range(n_cartelas):
-        globals()[f'cartela_{j}'] = []
         numeros = list(range(1, 76))
         random.shuffle(numeros)
 
