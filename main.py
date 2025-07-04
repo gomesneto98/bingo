@@ -176,15 +176,3 @@ with col_dir:
 
 sorteio = list(range(1, 76))
 random.shuffle(sorteio)
-
-while True:
-    numero = pega_numero(sorteio)
-    if numero is None:
-        print("Todos os números foram sorteados.")
-        break
-    print(f"Número sorteado: {numero}")
-    opcao = input(
-        "Digite 'c' para continuar ou 's' para sair: ").strip().lower()
-    if opcao == 's':
-        print("Saindo do jogo.")
-        break
