@@ -11,8 +11,8 @@ import random
 
 JOGADORES = 4
 
-def gerar_cartela():
 
+def gerar_cartela():
     """Gera uma cartela de bingo 5x5."""
     cartela = []
 
@@ -24,6 +24,7 @@ def gerar_cartela():
         cartela.append(coluna)
 
     return cartela
+
 
 def draw_cartela(c, x, y, cell_size, cartela):
     tamanho_fonte = int(cell_size * 0.5)
@@ -41,6 +42,7 @@ def draw_cartela(c, x, y, cell_size, cartela):
             tx = x + row*cell_size + cell_size/2
             ty = y - col*cell_size - cell_size/2
             c.drawCentredString(tx, ty - 4, str(num))
+
 
 def criar_pdf(cartelas, filename="cartelas.pdf"):
     c = canvas.Canvas(filename, pagesize=A4)
@@ -74,10 +76,12 @@ def criar_pdf(cartelas, filename="cartelas.pdf"):
     c.save()
     print(f"{filename} gerado com sucesso.")
 
+
 if __name__ == "__main__":
     # Exemplo: gerar 12 cartelas (2 páginas de 6 cada)
     cartelas = [gerar_cartela() for _ in range(JOGADORES)]
     criar_pdf(cartelas)
+
 
 def iniciar_jogo():
     st.session_state['sorteio'] = random.sample(range(1, 76), 75)
@@ -184,4 +188,3 @@ while True:
     if opcao == 's':
         print("Saindo do jogo.")
         break
-
