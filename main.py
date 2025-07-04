@@ -6,6 +6,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 import random
 
+
 JOGADORES = 4
 
 def gerar_cartela():
@@ -80,14 +81,11 @@ if __name__ == "__main__":
     cartelas = [gerar_cartela() for _ in range(JOGADORES)]
     criar_pdf(cartelas)
 
-
-
 def pega_numero(sorteio):
     if sorteio:
         return sorteio.pop(0)
     else:
         return None
-
 
 sorteio = list(range(1, 76))
 random.shuffle(sorteio)
@@ -97,9 +95,7 @@ while True:
     if numero is None:
         print("Todos os números foram sorteados.")
         break
-
     print(f"Número sorteado: {numero}")
-
     opcao = input(
         "Digite 'c' para continuar ou 's' para sair: ").strip().lower()
     if opcao == 's':
