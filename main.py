@@ -1,11 +1,18 @@
 # Jogo de bingo
 
-import random
+
 import streamlit as st
 from textwrap import dedent
+import time
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import mm
+import random
 
+JOGADORES = 4
 
 def gerar_cartela():
+
     """Gera uma cartela de bingo 5x5."""
     cartela = []
 
@@ -18,6 +25,59 @@ def gerar_cartela():
 
     return cartela
 
+def draw_cartela(c, x, y, cell_size, cartela):
+    tamanho_fonte = int(cell_size * 0.5)
+    c.setFont("Helvetica-Bold", tamanho_fonte)
+
+    # desenha 5x5 células
+    for i in range(6):  # linhas horizontais
+        c.line(x, y - i*cell_size, x + 5*cell_size, y - i*cell_size)
+    for j in range(6):  # linhas verticais
+        c.line(x + j*cell_size, y, x + j*cell_size, y - 5*cell_size)
+    # preenche números
+    for row in range(5):
+        for col in range(5):
+            num = cartela[row][col]
+            tx = x + row*cell_size + cell_size/2
+            ty = y - col*cell_size - cell_size/2
+            c.drawCentredString(tx, ty - 4, str(num))
+
+def criar_pdf(cartelas, filename="cartelas.pdf"):
+    c = canvas.Canvas(filename, pagesize=A4)
+    page_w, page_h = A4
+
+    # margens e espaçamento
+    margin_x = 15 * mm
+    margin_y = 15 * mm
+    gutter_x = 10 * mm
+    gutter_y = 10 * mm
+
+    # calcula espaço disponível e tamanho da célula
+    avail_w = (page_w - 2*margin_x - gutter_x) / 2
+    avail_h = (page_h - 2*margin_y - 2*gutter_y) / 3
+    cell_size = min(avail_w/5, avail_h/5)
+
+    for idx, cartela in enumerate(cartelas):
+        # quando ultrapassar 6 por página, começa nova
+        if idx > 0 and idx % 6 == 0:
+            c.showPage()
+
+        pos = idx % 6
+        col = pos % 2
+        row = pos // 2
+
+        x = margin_x + col * (5*cell_size + gutter_x)
+        y = page_h - margin_y - row * (5*cell_size + gutter_y)
+
+        draw_cartela(c, x, y, cell_size, cartela)
+
+    c.save()
+    print(f"{filename} gerado com sucesso.")
+
+if __name__ == "__main__":
+    # Exemplo: gerar 12 cartelas (2 páginas de 6 cada)
+    cartelas = [gerar_cartela() for _ in range(JOGADORES)]
+    criar_pdf(cartelas)
 
 def iniciar_jogo():
     st.session_state['sorteio'] = random.sample(range(1, 76), 75)
@@ -110,32 +170,18 @@ with col_dir:
     st.subheader("Números Sorteados")
     exibir_pool_bingo()
 
+sorteio = list(range(1, 76))
+random.shuffle(sorteio)
 
-# if 'jogo_iniciado' not in st.session_state:
-#     st.session_state['jogo_iniciado'] = False
+while True:
+    numero = pega_numero(sorteio)
+    if numero is None:
+        print("Todos os números foram sorteados.")
+        break
+    print(f"Número sorteado: {numero}")
+    opcao = input(
+        "Digite 'c' para continuar ou 's' para sair: ").strip().lower()
+    if opcao == 's':
+        print("Saindo do jogo.")
+        break
 
-# if not st.session_state['jogo_iniciado']:
-#     if st.sidebar.button('Novo Jogo'):
-#         st.session_state['mostrar_entrada'] = True
-
-#     if st.session_state.get('mostrar_entrada'):
-#         if st.button('Confirmar'):
-#             iniciar_jogo()
-#             st.session_state['mostrar_entrada'] = False
-# else:
-#     if 'sorteio' not in st.session_state or not st.session_state['sorteio']:
-#         col1, col2 = st.columns(2)
-#         with col1:
-#             if st.button('Sortear Novo Número'):
-#                 sortear_numero()
-#         with col2:
-#             if st.sidebar.button('Sair do Jogo'):
-#                 st.session_state.clear()
-#                 st.experimental_rerun()
-#         if st.session_state.get('numero_atual') is not None:
-#             st.write(f'Número sorteado: {st.session_state["numero_atual"]}')
-#         elif st.session_state['sorteio'] == []:
-#             st.write('Todos os números foram sorteados.')
-#             if st.button('Novo Jogo'):
-#                 st.session_state.clear()
-#                 st.experimental_rerun()
