@@ -8,9 +8,10 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 import random
+import base64
 
-JOGADORES = 4
-
+if 'jogo_iniciado' not in st.session_state:
+    st.session_state['jogo_iniciado'] = False
 
 def gerar_cartela():
     """Gera uma cartela de bingo 5x5."""
@@ -21,6 +22,8 @@ def gerar_cartela():
 
     for i in range(5):
         coluna = [n for n in numeros if (n-1) // 15 == i][:5]
+        if i == 2:
+            coluna[2] = " "
         cartela.append(coluna)
 
     return cartela
@@ -76,11 +79,20 @@ def criar_pdf(cartelas, filename="cartelas.pdf"):
     c.save()
     print(f"{filename} gerado com sucesso.")
 
+def mostrar_pdf_embed(caminho_pdf, largura="100%", altura="800px"):
+    with open(caminho_pdf, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode("utf-8")
+    iframe = (
+        f'<iframe src="data:application/pdf;base64,{b64}" '
+        f'width="{largura}" height="{altura}" type="application/pdf"></iframe>'
+    )
+    st.markdown(iframe, unsafe_allow_html=True)
 
-if __name__ == "__main__":
-    # Exemplo: gerar 12 cartelas (2 páginas de 6 cada)
-    cartelas = [gerar_cartela() for _ in range(JOGADORES)]
-    criar_pdf(cartelas)
+def gerar_tudo(n_jogadores):
+    cartelas = [gerar_cartela() for _ in range(n_jogadores)]
+    pdf_path = "cartelas.pdf"
+    criar_pdf(cartelas, filename=pdf_path)
+    return pdf_path
 
 
 def iniciar_jogo():
@@ -157,22 +169,34 @@ def exibir_pool_bingo():
 
     st.markdown(html, unsafe_allow_html=True)
 
+jogadores = st.sidebar.number_input(
+    "Informe o número de jogadores:",
+    min_value=1,
+    value=1,
+    step=1
+)
+
+if st.sidebar.button('Gerar Cartelas'):
+    st.session_state['jogo_iniciado'] = False
+    pdf_path = gerar_tudo(jogadores)
+    with st.expander('📄 Visualizar/Esconder Cartelas', expanded=True):
+        mostrar_pdf_embed(pdf_path)
 
 st.sidebar.button('Iniciar Jogo', on_click=iniciar_jogo)
 
-if st.sidebar.button('Sortear Número', on_click=sortear_numero):
-    pass  # só dispara o callback
 
-# cria duas colunas: à esquerda seu título/cartão; à direita o pool de bolinhas
+if st.session_state['jogo_iniciado'] and st.sidebar.button('Sortear Número'):
+    sortear_numero()
+
 col_esq, col_dir = st.columns([2, 1])
-
 with col_esq:
-    st.title("Bingo do João")
-    exibir_cartao_numero()      # sua função de mostrar o número grande
-
+    if st.session_state['jogo_iniciado']:
+        st.title("Bingo do João")
+        exibir_cartao_numero()
 with col_dir:
-    st.subheader("Números Sorteados")
-    exibir_pool_bingo()
+    if st.session_state['jogo_iniciado']:
+        st.subheader("Números Sorteados")
+        exibir_pool_bingo()
 
 sorteio = list(range(1, 76))
 random.shuffle(sorteio)
